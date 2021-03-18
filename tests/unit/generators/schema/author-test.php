@@ -311,6 +311,7 @@ class Author_Test extends TestCase {
 	 * @covers ::set_image_from_options
 	 */
 	public function test_set_image_from_options_when_site_represents_current_author() {
+		$person_logo_id                                  = 'person_logo_id';
 		$user_data                                       = (object) [
 			'display_name' => 'Piet',
 			'user_url'     => 'https://piet.blog/',
@@ -318,11 +319,6 @@ class Author_Test extends TestCase {
 		$this->instance->context->site_user_id           = 123;
 		$this->instance->context->site_url               = 'http://example.com';
 		$this->instance->context->site_represents        = 'person';
-		$this->instance->context->person_logo_meta       = [
-			'height' => 100,
-			'width'  => 100,
-			'url'    => 'http://example.com/image.png',
-		];
 		$this->instance->context->indexable              = new Indexable_Mock();
 		$this->instance->context->indexable->object_type = 'user';
 		$this->instance->context->indexable->object_id   = 123;
@@ -334,7 +330,7 @@ class Author_Test extends TestCase {
 		Filters\expectApplied( 'wpseo_schema_person_social_profiles' )
 			->andReturn( [] );
 
-		$this->set_helpers_expectations( $user_data );
+		$this->set_helpers_expectations( $user_data, $person_logo_id );
 
 		$data = $this->instance->generate();
 
@@ -347,6 +343,7 @@ class Author_Test extends TestCase {
 	 * @covers ::generate
 	 */
 	public function test_generate_type_when_site_represents_current_author() {
+		$person_logo_id                                  = 'person_logo_id';
 		$user_data                                       = (object) [
 			'display_name' => 'Piet',
 			'user_url'     => 'https://piet.blog/',
@@ -354,11 +351,6 @@ class Author_Test extends TestCase {
 		$this->instance->context->site_user_id           = 123;
 		$this->instance->context->site_url               = 'http://example.com';
 		$this->instance->context->site_represents        = 'person';
-		$this->instance->context->person_logo_meta       = [
-			'height' => 100,
-			'width'  => 100,
-			'url'    => 'http://example.com/image.png',
-		];
 		$this->instance->context->indexable              = new Indexable_Mock();
 		$this->instance->context->indexable->object_type = 'user';
 		$this->instance->context->indexable->object_id   = 123;
@@ -370,7 +362,7 @@ class Author_Test extends TestCase {
 		Filters\expectApplied( 'wpseo_schema_person_social_profiles' )
 			->andReturn( [] );
 
-		$this->set_helpers_expectations( $user_data );
+		$this->set_helpers_expectations( $user_data, $person_logo_id );
 
 		$data = $this->instance->generate();
 
@@ -380,9 +372,10 @@ class Author_Test extends TestCase {
 	/**
 	 * Sets expectations on the helpers.
 	 *
-	 * @param object $user_data The user data object.
+	 * @param object $user_data      The user data object.
+	 * @param string $person_logo_id The person logo id.
 	 */
-	private function set_helpers_expectations( $user_data ) {
+	private function set_helpers_expectations( $user_data, $person_logo_id ) {
 		$this->instance->helpers->schema->id
 			->expects( 'get_user_schema_id' )
 			->with( $this->instance->context->indexable->object_id, $this->instance->context )
@@ -393,15 +386,16 @@ class Author_Test extends TestCase {
 			->with( $user_data->display_name )
 			->andReturn( $user_data->display_name );
 
+		$this->instance->helpers->image
+			->expects( 'get_attachment_id_from_settings' )
+			->with( 'person_logo' )
+			->andReturn( $person_logo_id );
+
 		$this->instance->helpers->schema->image
-			->expects( 'generate_from_attachment_meta' )
+			->expects( 'generate_from_attachment_id' )
 			->with(
 				$this->instance->context->site_url . Schema_IDs::PERSON_LOGO_HASH,
-				[
-					'height' => 100,
-					'width'  => 100,
-					'url'    => 'http://example.com/image.png',
-				],
+				$person_logo_id,
 				$user_data->display_name
 			)
 			->andReturn( 'our_image_schema' );

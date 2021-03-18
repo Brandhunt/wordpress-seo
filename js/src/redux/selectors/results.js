@@ -1,4 +1,4 @@
-import { get, isEmpty } from "lodash";
+import { get } from "lodash-es";
 
 /**
  * Gets the SEO results.
@@ -8,9 +8,7 @@ import { get, isEmpty } from "lodash";
  * @returns {Object} The SEO results for all keywords.
  */
 export function getSeoResults( state ) {
-	const results = get( state, "analysis.seo", {} );
-
-	return isEmpty( results ) ? { results: [], overallScore: null } : results;
+	return get( state, [ "analysis", "seo" ], {} );
 }
 
 /**
@@ -35,9 +33,7 @@ export function getResultsForKeyword( state, keyword ) {
  * @returns {object} The results and overall score for the readability analysis.
  */
 export function getReadabilityResults( state ) {
-	const results = get( state, "analysis.readability", {} );
-
-	return isEmpty( results ) ? { results: [], overallScore: null } : results;
+	return get( state, [ "analysis", "readability" ], {} );
 }
 
 /**

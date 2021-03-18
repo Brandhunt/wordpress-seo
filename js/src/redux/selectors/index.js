@@ -9,7 +9,6 @@ export * from "./facebookEditor";
 export * from "./fallbacks";
 export * from "./focusKeyPhrase";
 export * from "./marker";
-export * from "./dismissedAlerts";
 export * from "./preferences";
 export * from "./primaryTaxonomies";
 export * from "./results";

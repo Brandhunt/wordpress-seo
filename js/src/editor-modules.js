@@ -21,7 +21,6 @@ import SidebarItem from "./components/SidebarItem";
 import * as ajaxHelper from "./helpers/ajaxHelper";
 import EditorModal from "./containers/EditorModal";
 import ImageSelectPortal from "./components/portals/ImageSelectPortal";
-import PersistentDismissableAlert from "./containers/PersistentDismissableAlert";
 
 window.yoast = window.yoast || {};
 window.yoast.editorModules = {
@@ -54,7 +53,6 @@ window.yoast.editorModules = {
 	},
 	containers: {
 		EditorModal,
-		PersistentDismissableAlert,
 		Results,
 		SEMrushRelatedKeyphrases,
 	},

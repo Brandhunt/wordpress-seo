@@ -1,9 +1,17 @@
 /* global wpseoScriptData */
-import { withSelect } from "@wordpress/data";
-import { Component, Fragment } from "@wordpress/element";
-import { replacementVariablesShape } from "@yoast/replacement-variable-editor";
-import { includes, map } from "lodash";
+
+/* External dependencies */
+import { Fragment, Component } from "@wordpress/element";
 import PropTypes from "prop-types";
+import {
+	includes,
+	map,
+} from "lodash-es";
+import { connect } from "react-redux";
+import { replacementVariablesShape } from "@yoast/replacement-variable-editor";
+
+/* Internal dependencies */
+import { updateReplacementVariable } from "../redux/actions/snippetEditor";
 import SettingsEditorPortal from "./portals/SettingsEditorPortal";
 import SettingsFieldPortal from "./portals/SettingsFieldPortal";
 
@@ -155,11 +163,9 @@ SettingsReplacementVariableEditors.defaultProps = {
 	singleFieldElements: [],
 };
 
-export default withSelect( select => {
-	const { getReplaceVars, getRecommendedReplaceVars } = select( "yoast-seo/settings" );
-
-	return {
-		replacementVariables: getReplaceVars(),
-		recommendedReplacementVariables: getRecommendedReplaceVars(),
-	};
+export default connect( state => ( {
+	replacementVariables: state.snippetEditor.replacementVariables,
+	recommendedReplacementVariables: state.snippetEditor.recommendedReplacementVariables,
+} ), {
+	updateReplacementVariable,
 } )( SettingsReplacementVariableEditors );

@@ -51,28 +51,16 @@ class Disable_Core_Sitemaps_Test extends TestCase {
 	}
 
 	/**
-	 * Tests the initialization.
+	 * Tests the situation when primary term id isn't to the category id, the id should get updated.
+	 * WordPress sitemaps should be disabled and a redirect should be added to the WP sitemap URL.
 	 *
 	 * @covers ::__construct
 	 * @covers ::initialize
 	 */
 	public function test_initialize() {
-		$this->instance->initialize();
-
-		$this->assertNotFalse( \has_action( 'plugins_loaded', [ $this->instance, 'maybe_disable_core_sitemaps' ] ), 'Does not have expected plugins_loaded action' );
-	}
-
-	/**
-	 * Tests the situation when primary term id isn't to the category id, the id should get updated.
-	 * WordPress sitemaps should be disabled and a redirect should be added to the WP sitemap URL.
-	 *
-	 * @covers ::__construct
-	 * @covers ::maybe_disable_core_sitemaps
-	 */
-	public function test_maybe_disable_core_sitemaps() {
 		$this->options->expects( 'get' )->with( 'enable_xml_sitemap' )->andReturn( true );
 
-		$this->instance->maybe_disable_core_sitemaps();
+		$this->instance->initialize();
 
 		$this->assertNotFalse( \has_filter( 'wp_sitemaps_enabled', '__return_false' ), 'Does not have expected wp_sitemaps_enabled filter' );
 		$this->assertNotFalse( \has_action( 'template_redirect', [ $this->instance, 'template_redirect' ] ), 'Does not have expected template_redirect action' );
@@ -83,12 +71,12 @@ class Disable_Core_Sitemaps_Test extends TestCase {
 	 * WordPress sitemaps should be disabled and a redirect should be added to the WP sitemap URL.
 	 *
 	 * @covers ::__construct
-	 * @covers ::maybe_disable_core_sitemaps
+	 * @covers ::initialize
 	 */
-	public function test_maybe_disable_core_sitemaps_without_sitemaps() {
+	public function test_initialize_without_sitemaps() {
 		$this->options->expects( 'get' )->with( 'enable_xml_sitemap' )->andReturn( false );
 
-		$this->instance->maybe_disable_core_sitemaps();
+		$this->instance->initialize();
 
 		$this->assertFalse( \has_filter( 'wp_sitemaps_enabled', '__return_false' ), 'Does not have expected wp_sitemaps_enabled filter' );
 		$this->assertFalse( \has_action( 'template_redirect', [ $this->instance, 'template_redirect' ] ), 'Has unexpected template_redirect action' );

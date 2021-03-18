@@ -1,97 +1,81 @@
-import { mapDispatchToProps, mapSelectToProps } from "../../src/containers/SnippetEditor";
+import {
+	mapDispatchToProps,
+	mapStateToProps,
+} from "../../src/containers/SnippetEditor";
+import { switchMode, updateData } from "../../src/redux/actions/snippetEditor";
+
 
 describe( "SnippetEditor container", () => {
-	it( "maps select to the props", () => {
-		const select = jest.fn( name => {
-			if ( name === "yoast-seo/editor" ) {
-				return {
-					getBaseUrlFromSettings: jest.fn().mockReturnValue( "https://localhost.test" ),
-					getDateFromSettings: jest.fn().mockReturnValue( "01-01-1970" ),
-					getFocusKeyphrase: jest.fn().mockReturnValue( "active" ),
-					getRecommendedReplaceVars: jest.fn().mockReturnValue( [
+	it( "maps the state to the props", () => {
+		const state = {
+			focusKeyword: "active",
+			snippetEditor: {
+				mode: "desktop",
+				data: {
+					title: "Title",
+					slug: "slug",
+					description: "Description",
+				},
+				replacementVariables: [
+					{
+						name: "variable",
+						value: "Value",
+					},
+				],
+			},
+			settings: {
+				snippetEditor: {
+					baseUrl: "https://localhost.test",
+					date: "01-01-1970",
+					recommendedReplacementVariables: [
 						{
 							name: "variable",
 							value: "Value",
 						},
-					] ),
-					getReplaceVars: jest.fn().mockReturnValue( [
-						{
-							name: "variable",
-							value: "Value",
-						},
-					] ),
-					getSiteIconUrlFromSettings: jest.fn().mockReturnValue( "https://localhost.test/wp-content/uploads/2021/01/WordPress1.jpg" ),
-					getSnippetEditorData: jest.fn().mockReturnValue( {
-						title: "Title",
-						slug: "slug",
-						description: "Description",
-					} ),
-					getSnippetEditorMode: jest.fn().mockReturnValue( "desktop" ),
-					getSnippetEditorPreviewImageUrl: jest.fn().mockReturnValue( "https://localhost.test/wp-content/uploads/2021/01/WordPress2.jpg" ),
-					getSnippetEditorWordsToHighlight: jest.fn().mockReturnValue( [ "active" ] ),
-				};
-			}
-		} );
-
+					],
+				},
+			},
+		};
 		const expected = {
-			baseUrl: "https://localhost.test",
+			mode: "desktop",
+			keyword: "active",
 			data: {
 				title: "Title",
 				slug: "slug",
 				description: "Description",
 			},
-			date: "01-01-1970",
-			faviconSrc: "https://localhost.test/wp-content/uploads/2021/01/WordPress1.jpg",
-			keyword: "active",
-			mobileImageSrc: "https://localhost.test/wp-content/uploads/2021/01/WordPress2.jpg",
-			mode: "desktop",
-			recommendedReplacementVariables: [
-				{
-					name: "variable",
-					value: "Value",
-				},
-			],
 			replacementVariables: [
 				{
 					name: "variable",
 					value: "Value",
 				},
 			],
-			wordsToHighlight: [ "active" ],
+			baseUrl: "https://localhost.test",
+			date: "01-01-1970",
+			recommendedReplacementVariables: [
+				{
+					name: "variable",
+					value: "Value",
+				},
+			],
 		};
 
-		const result = mapSelectToProps( select );
+		const result = mapStateToProps( state );
 
 		expect( result ).toEqual( expected );
 	} );
 
 	it( "maps dispatch to props", () => {
-		const dispatchers = {
-			switchMode: jest.fn(),
-			updateData: jest.fn(),
-			updateAnalysisData: jest.fn(),
-		};
-		const dispatch = jest.fn( name => {
-			if ( name === "yoast-seo/editor" ) {
-				return dispatchers;
-			}
-		} );
+		const dispatch = jest.fn();
 
 		const result = mapDispatchToProps( dispatch );
 
-		expect( typeof result.onChange ).toEqual( "function" );
-		expect( result.onChangeAnalysisData ).toBe( dispatchers.updateAnalysisData );
-
-		result.onChange( "mode", "mobile" );
-		expect( dispatchers.switchMode ).toHaveBeenCalledWith( "mobile" );
-
-		result.onChange( "slug", "snail" );
-		expect( dispatchers.updateData ).toHaveBeenCalledWith( { slug: "snail" } );
-
+		result.onChange( "mode", "some-mode" );
 		result.onChange( "title", "Title" );
-		expect( dispatchers.updateData ).toHaveBeenCalledWith( { title: "Title" } );
 
-		result.onChangeAnalysisData( "data" );
-		expect( dispatchers.updateAnalysisData ).toHaveBeenCalledWith( "data" );
+		expect( dispatch.mock.calls ).toEqual( [
+			[ switchMode( "some-mode" ) ],
+			[ updateData( { title: "Title" } ) ],
+		] );
 	} );
 } );

@@ -259,12 +259,10 @@ class WPSEO_Admin_Asset_Manager {
 					'jquery-ui-core',
 					'jquery-ui-progressbar',
 					'wp-api',
-					'wp-data',
-					'wp-element',
-					'yoast-seo-api',
 					self::PREFIX . 'yoast-components',
 					self::PREFIX . 'helpers',
 					self::PREFIX . 'replacement-variable-editor',
+					self::PREFIX . 'redux',
 					self::PREFIX . 'select2',
 					self::PREFIX . 'select2-translations',
 					self::PREFIX . 'commons',
@@ -312,7 +310,6 @@ class WPSEO_Admin_Asset_Manager {
 					'wp-i18n',
 					'wp-plugins',
 					'wp-rich-text',
-					'yoast-seo-api',
 					self::PREFIX . 'yoast-components',
 					self::PREFIX . 'legacy-components',
 					self::PREFIX . 'search-metadata-previews',
@@ -329,9 +326,7 @@ class WPSEO_Admin_Asset_Manager {
 					'wp-api-fetch',
 					'wp-components',
 					'wp-compose',
-					'wp-data',
 					'wp-element',
-					'yoast-seo-api',
 					self::PREFIX . 'redux',
 					self::PREFIX . 'yoast-components',
 					self::PREFIX . 'legacy-components',
@@ -804,7 +799,6 @@ class WPSEO_Admin_Asset_Manager {
 					'wp-sanitize',
 					'wp-api-fetch',
 					'wp-hooks',
-					'yoast-seo-api',
 					self::PREFIX . 'components',
 					self::PREFIX . 'analysis',
 					self::PREFIX . 'commons',
@@ -848,10 +842,6 @@ class WPSEO_Admin_Asset_Manager {
 			[
 				'name' => 'alert',
 				'src'  => 'alerts-' . $flat_version,
-			],
-			[
-				'name' => 'badge',
-				'src'  => 'badge-' . $flat_version,
 			],
 			[
 				'name' => 'edit-page',
@@ -954,5 +944,18 @@ class WPSEO_Admin_Asset_Manager {
 		}
 
 		return $this->asset_location->get_url( $asset, $type );
+	}
+
+	/* ********************* DEPRECATED METHODS ********************* */
+
+	/**
+	 * This function is needed for backwards compatibility with Local SEO 12.5.
+	 *
+	 * @deprecated 12.8
+	 * @codeCoverageIgnore
+	 *
+	 * @return void
+	 */
+	public function register_wp_assets() {
 	}
 }

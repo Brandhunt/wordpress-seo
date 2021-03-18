@@ -143,7 +143,6 @@ class Image_Helper_Test extends TestCase {
 			'@type'      => 'ImageObject',
 			'@id'        => 'https://example.com/#logo',
 			'url'        => 'https://example.com/logo.jpg',
-			'contentUrl' => 'https://example.com/logo.jpg',
 			'width'      => 256,
 			'height'     => 512,
 			'caption'    => 'Company name',
@@ -189,7 +188,6 @@ class Image_Helper_Test extends TestCase {
 			'@type'      => 'ImageObject',
 			'@id'        => 'https://example.com/#logo',
 			'url'        => 'https://example.com/logo.jpg',
-			'contentUrl' => 'https://example.com/logo.jpg',
 			'caption'    => 'Company name',
 			'inLanguage' => 'language',
 		];
@@ -247,7 +245,6 @@ class Image_Helper_Test extends TestCase {
 			'@type'      => 'ImageObject',
 			'@id'        => 'https://example.com/#logo',
 			'url'        => 'https://example.com/logo.jpg',
-			'contentUrl' => 'https://example.com/logo.jpg',
 			'caption'    => 'Image caption',
 			'inLanguage' => 'language',
 		];
@@ -298,7 +295,6 @@ class Image_Helper_Test extends TestCase {
 			'@type'      => 'ImageObject',
 			'@id'        => 'https://example.com/#logo',
 			'url'        => 'https://example.com/logo.jpg',
-			'contentUrl' => 'https://example.com/logo.jpg',
 			'inLanguage' => 'language',
 		];
 
@@ -330,7 +326,6 @@ class Image_Helper_Test extends TestCase {
 			'@type'      => 'ImageObject',
 			'@id'        => 'https://example.com/#logo',
 			'url'        => 'https://example.com/logo.jpg',
-			'contentUrl' => 'https://example.com/logo.jpg',
 			'inLanguage' => 'language',
 			'caption'    => 'Image caption',
 		];

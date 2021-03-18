@@ -5,14 +5,12 @@ import TopLevelProviders from "../TopLevelProviders";
 /**
  * Renders the Sidebar slot.
  *
- * @param {Object} props The props.
- * @param {Object} props.theme The theme.
- *
  * @returns {null|wp.Element} The element.
  */
-export default function SidebarSlot( { theme } ) {
+export default function SidebarSlot( { store, theme } ) {
 	return (
 		<TopLevelProviders
+			store={ store }
 			theme={ theme }
 			location={ "sidebar" }
 		>

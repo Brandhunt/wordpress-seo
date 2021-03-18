@@ -1,15 +1,20 @@
 /* global wpseoAdminL10n */
-import { Slot } from "@wordpress/components";
-import { compose } from "@wordpress/compose";
-import { withDispatch, withSelect } from "@wordpress/data";
+
+/* External dependencies */
 import { Component } from "@wordpress/element";
+import { Slot } from "@wordpress/components";
 import { __ } from "@wordpress/i18n";
 import PropTypes from "prop-types";
-import styled from "styled-components";
+import { connect } from "react-redux";
 import { KeywordInput as KeywordInputComponent } from "yoast-components";
-import SEMrushModal from "../../containers/SEMrushRelatedKeyphrasesModal";
-import { LocationConsumer } from "../contexts/location";
+import styled from "styled-components";
+
+/* Internal dependencies */
+import { setFocusKeyword } from "../../redux/actions";
+import { setMarkerPauseStatus } from "../../redux/actions";
 import HelpLink from "../HelpLink";
+import { LocationConsumer } from "../contexts/location";
+import SEMrushModal from "../../containers/SEMrushRelatedKeyphrasesModal";
 
 const KeywordInputContainer = styled.div`
 	padding: 16px;
@@ -76,7 +81,7 @@ class KeywordInput extends Component {
 	/**
 	 * Renders the component.
 	 *
-	 * @returns {JSX.Element} The component.
+	 * @returns {wp.Element} The component.
 	 */
 	render() {
 		const errors = this.validate();
@@ -128,20 +133,39 @@ KeywordInput.defaultProps = {
 
 export { KeywordInput };
 
-export default compose( [
-	withSelect( ( select ) => {
-		const { getFocusKeyphrase, getSEMrushNoKeyphraseMessage } = select( "yoast-seo/editor" );
-		return {
-			keyword: getFocusKeyphrase(),
-			displayNoKeyphraseMessage: getSEMrushNoKeyphraseMessage(),
-		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		const { setFocusKeyword, setMarkerPauseStatus } = dispatch( "yoast-seo/editor" );
-		return {
-			onFocusKeywordChange: setFocusKeyword,
-			onFocusKeyword: () => setMarkerPauseStatus( true ),
-			onBlurKeyword: () => setMarkerPauseStatus( false ),
-		};
-	} ),
-] )( KeywordInput );
+/**
+ * Maps redux state to SeoAnalysis props.
+ *
+ * @param {Object} state The redux state.
+ *
+ * @returns {Object} Props that should be passed to SeoAnalysis.
+ */
+function mapStateToProps( state ) {
+	return {
+		keyword: state.focusKeyword,
+		displayNoKeyphraseMessage: state.SEMrushModal.displayNoKeyphraseMessage,
+	};
+}
+
+/**
+ * Maps the redux dispatch to KeywordInput props.
+ *
+ * @param {Function} dispatch The dispatch function that will dispatch a redux action.
+ *
+ * @returns {Object} Props for the `KeywordInput` component.
+ */
+function mapDispatchToProps( dispatch ) {
+	return {
+		onFocusKeywordChange: ( value ) => {
+			dispatch( setFocusKeyword( value ) );
+		},
+		onFocusKeyword: () => {
+			dispatch( setMarkerPauseStatus( true ) );
+		},
+		onBlurKeyword: () => {
+			dispatch( setMarkerPauseStatus( false ) );
+		},
+	};
+}
+
+export default connect( mapStateToProps, mapDispatchToProps )( KeywordInput );

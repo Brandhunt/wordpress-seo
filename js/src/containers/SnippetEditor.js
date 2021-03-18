@@ -1,8 +1,14 @@
-import { compose } from "@wordpress/compose";
-import { withDispatch, withSelect } from "@wordpress/data";
-import { __ } from "@wordpress/i18n";
+import { connect } from "react-redux";
 import { SnippetEditor } from "@yoast/search-metadata-previews";
+import { __ } from "@wordpress/i18n";
+import { dispatch as wpDataDispatch } from "@wordpress/data";
 import { LocationConsumer } from "../components/contexts/location";
+
+import {
+	switchMode,
+	updateData,
+	updateAnalysisData,
+} from "../redux/actions";
 import SnippetPreviewSection from "../components/SnippetPreviewSection";
 import { applyReplaceUsingPlugin } from "../helpers/replacementVariableHelpers";
 
@@ -66,27 +72,15 @@ const SnippetEditorWrapper = ( props ) => (
 );
 
 /**
- * Maps the select function to props.
+ * Maps the redux state to the snippet editor component.
  *
- * @param {function} select The select function.
+ * @param {Object} state The current state.
+ * @param {Object} state.snippetEditor The state for the snippet editor.
  *
- * @returns {Object} The props.
+ * @returns {Object} Data for the `SnippetEditor` component.
  */
-export function mapSelectToProps( select ) {
-	const {
-		getBaseUrlFromSettings,
-		getDateFromSettings,
-		getFocusKeyphrase,
-		getRecommendedReplaceVars,
-		getReplaceVars,
-		getSiteIconUrlFromSettings,
-		getSnippetEditorData,
-		getSnippetEditorMode,
-		getSnippetEditorPreviewImageUrl,
-		getSnippetEditorWordsToHighlight,
-	} = select( "yoast-seo/editor" );
-
-	const replacementVariables = getReplaceVars();
+export function mapStateToProps( state ) {
+	const replacementVariables = state.snippetEditor.replacementVariables;
 
 	// Replace all empty values with %%replaceVarName%% so the replacement variables plugin can do its job.
 	replacementVariables.forEach( ( replaceVariable ) => {
@@ -96,54 +90,51 @@ export function mapSelectToProps( select ) {
 	} );
 
 	return {
-		baseUrl: getBaseUrlFromSettings(),
-		data: getSnippetEditorData(),
-		date: getDateFromSettings(),
-		faviconSrc: getSiteIconUrlFromSettings(),
-		keyword: getFocusKeyphrase(),
-		mobileImageSrc: getSnippetEditorPreviewImageUrl(),
-		mode: getSnippetEditorMode(),
-		recommendedReplacementVariables: getRecommendedReplaceVars(),
-		replacementVariables,
-		wordsToHighlight: getSnippetEditorWordsToHighlight(),
+		...state.snippetEditor,
+		keyword: state.focusKeyword,
+		baseUrl: state.settings.snippetEditor.baseUrl,
+		date: state.settings.snippetEditor.date,
+		recommendedReplacementVariables: state.settings.snippetEditor.recommendedReplacementVariables,
+		faviconSrc: state.settings.snippetEditor.siteIconUrl,
+		mobileImageSrc: state.snippetEditor.data.snippetPreviewImageURL,
 	};
 }
 
 /**
- * Maps the dispatch function to props.
+ * Maps dispatch function to props for the snippet editor component.
  *
- * @param {function} dispatch The dispatch function.
+ * @param {Function} dispatch The dispatch function that will dispatch a redux action.
  *
- * @returns {Object} The props.
+ * @returns {Object} Props for the `SnippetEditor` component.
  */
 export function mapDispatchToProps( dispatch ) {
-	const {
-		updateData,
-		switchMode,
-		updateAnalysisData,
-	} = dispatch( "yoast-seo/editor" );
-
 	return {
 		onChange: ( key, value ) => {
-			switch ( key ) {
-				case "mode":
-					switchMode( value );
-					break;
-				case "slug":
-					updateData( { slug: value } );
-					break;
-				default:
-					updateData( {
-						[ key ]: value,
-					} );
-					break;
+			let action = updateData( {
+				[ key ]: value,
+			} );
+
+			if ( key === "mode" ) {
+				action = switchMode( value );
+			}
+
+			dispatch( action );
+
+			/*
+			 * Update the gutenberg store with the new slug, after updating our own store,
+			 * to make sure our store isn't updated twice.
+			 */
+			if ( key === "slug" ) {
+				const coreEditorDispatch = wpDataDispatch( "core/editor" );
+				if ( coreEditorDispatch ) {
+					coreEditorDispatch.editPost( { slug: value } );
+				}
 			}
 		},
-		onChangeAnalysisData: updateAnalysisData,
+		onChangeAnalysisData: ( analysisData ) => {
+			dispatch( updateAnalysisData( analysisData ) );
+		},
 	};
 }
 
-export default compose( [
-	withSelect( mapSelectToProps ),
-	withDispatch( mapDispatchToProps ),
-] )( SnippetEditorWrapper );
+export default connect( mapStateToProps, mapDispatchToProps )( SnippetEditorWrapper );
